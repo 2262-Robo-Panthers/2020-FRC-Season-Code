@@ -8,18 +8,17 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
-public class TeleopDrive extends CommandBase {
+public class Shoot extends CommandBase {
 
-	private final DriveSubsystem m_driveSubsystem;
+	private final ShooterSubsystem m_subsystem;
 
 	/**
-	 * Creates a new TeleopDrive.
+	 * Creates a new Shoot.
 	 */
-	public TeleopDrive(DriveSubsystem subsystem) {
-		m_driveSubsystem = subsystem;
-
+	public Shoot(ShooterSubsystem subsystem) {
+		m_subsystem = subsystem;
 		addRequirements(subsystem);
 	}
 
@@ -31,7 +30,6 @@ public class TeleopDrive extends CommandBase {
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
 	public void execute() {
-		// m_driveSubsystem.m_drive.arcadeDrive(xSpeed, zRotation, squareInputs);
 	}
 
 	// Called once the command ends or is interrupted.

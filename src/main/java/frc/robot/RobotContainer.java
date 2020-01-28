@@ -8,9 +8,13 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.TeleopDrive;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -26,10 +30,21 @@ public class RobotContainer {
 	private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
 	private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
 
-	private final TeleopDrive m_teleopDrive = new TeleopDrive(m_driveSubsystem);
+	private XboxController m_controller;
 
-	public final Joystick leftStick = new Joystick(Constants.leftStickPort);
-	public final Joystick rightStick = new Joystick(Constants.rightStickPort);
+	private final RunCommand teleopDrive = new RunCommand(
+		() -> m_driveSubsystem.manualDrive(m_controller.getY(Hand.kLeft), m_controller.getX(Hand.kRight)),
+		m_driveSubsystem);
+	private final PIDCommand moveHood = new PIDCommand(
+		new PIDController(Constants.hoodKP, Constants.hoodKI, Constants.hoodKD),
+		() -> m_shooterSubsystem.getHoodDistance(),
+		() -> m_shooterSubsystem.getHoodSetpoint(),
+		(output) -> {
+			m_shooterSubsystem.setHoodVoltage(output);
+		},
+		m_shooterSubsystem);
+	private final InstantCommand upshift = new InstantCommand(() -> m_driveSubsystem.upshift(), m_driveSubsystem);
+	private final InstantCommand downshift = new InstantCommand(() -> m_driveSubsystem.downshift(), m_driveSubsystem);
 
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -37,6 +52,8 @@ public class RobotContainer {
 	public RobotContainer() {
 		// Configure the button bindings
 		configureButtonBindings();
+
+		m_driveSubsystem.setDefaultCommand(teleopDrive);
 	}
 
 	/**
@@ -55,7 +72,6 @@ public class RobotContainer {
 	 * @return the command to run in autonomous
 	 */
 	public Command getAutonomousCommand() {
-		// An ExampleCommand will run in autonomous
-		return m_teleopDrive;
+		return teleopDrive;
 	}
 }

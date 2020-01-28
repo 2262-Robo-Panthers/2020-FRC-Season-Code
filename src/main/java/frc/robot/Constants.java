@@ -25,13 +25,21 @@ public final class Constants {
 	public static final int rightMainPort = 3;
 	public static final int rightSlavePort = 4;
 
-	public static final int flywheelMotorPort = 5;
+	public static final int shifterPorts[] = {5, 6};
 
-	public static final int leftStickPort = 6;
-	public static final int rightStickPort = 7;
+	public static final int flywheelMotorPort = 7;
+	public static final int shooterHoodPort = 8;
+	public static final int shooterHoodEncoderPorts[] = {9, 10};
+	public static final int topConveyorMotorPort = 11;
+	public static final int bottomConveyorMotorPort = 12;
+	public static final int shooterGatePorts[] = {13, 14};
+
+	public static final int intakeRollerPort = 15;
+	public static final int intakeDeployMotorPort = 16;
+	public static final int intakeDeployEncoderPort[] = {17, 18};
 
 	// Flywheel speed in RPM
-	public static final double flywheelSpeed = 2920.0;
+	public static final double flywheelSpeed = 2450.0;
 
 	// Flywheel PID constants
 	public static final double flywheelKP = 1.0;
@@ -39,11 +47,18 @@ public final class Constants {
 	public static final double flywheelKD = 0.0;
 
 	// Flywheel feedforward constants
-	// TODO - Use WPILib characterization to find
 	public static final double flywheelKS = 0.0;
 	public static final double flywheelKV = 0.0;
 
+	// So now there's PID on the shooter hood (probably)
+	public static final double hoodKP = 1.0;
+	public static final double hoodKI = 0.0;
+	public static final double hoodKD = 0.0;
+
 	// This is in Volts, crazy stuff
 	public static final double drivetrainMaxVoltage = 10.0;
+
+	// Seconds, crazy I know
+	public static final double drivetrainRampRate = 0.5;
 
 }

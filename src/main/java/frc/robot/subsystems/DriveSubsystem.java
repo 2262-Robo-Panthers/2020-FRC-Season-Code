@@ -9,25 +9,41 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class DriveSubsystem extends SubsystemBase {
 
-	private WPI_TalonFX leftMain = new WPI_TalonFX(Constants.leftMainPort);
-	private WPI_TalonFX leftSlave = new WPI_TalonFX(Constants.leftSlavePort);
-	private WPI_TalonFX rightMain = new WPI_TalonFX(Constants.rightMainPort);
-	private WPI_TalonFX rightSlave = new WPI_TalonFX(Constants.rightSlavePort);
+	private final WPI_TalonFX leftMain;
+	private final WPI_TalonFX leftSlave;
+	private final WPI_TalonFX rightMain;
+	private final WPI_TalonFX rightSlave;
 
-	public DifferentialDrive m_drive = new DifferentialDrive(leftMain, rightMain);
+	private final DifferentialDrive m_drive;
+
+	private final DoubleSolenoid shifter;
 
 	public DriveSubsystem() {
+
+		leftMain = new WPI_TalonFX(Constants.leftMainPort);
+		leftSlave = new WPI_TalonFX(Constants.leftSlavePort);
+		rightMain = new WPI_TalonFX(Constants.rightMainPort);
+		rightSlave = new WPI_TalonFX(Constants.rightSlavePort);
+
+		m_drive = new DifferentialDrive(leftMain, rightMain);
+
+		shifter = new DoubleSolenoid(Constants.shifterPorts[0], Constants.shifterPorts[1]);
+
 		leftSlave.follow(leftMain);
 		rightSlave.follow(rightMain);
 
 		leftMain.configVoltageCompSaturation(Constants.drivetrainMaxVoltage);
 		rightMain.configVoltageCompSaturation(Constants.drivetrainMaxVoltage);
+		leftMain.configOpenloopRamp(Constants.drivetrainRampRate);
+		rightMain.configOpenloopRamp(Constants.drivetrainRampRate);
 		leftMain.enableVoltageCompensation(true);
 		rightMain.enableVoltageCompensation(true);
 	}
@@ -37,4 +53,15 @@ public class DriveSubsystem extends SubsystemBase {
 		// This method will be called once per scheduler run
 	}
 
+	public void upshift() {
+		shifter.set(Value.kReverse);
+	}
+
+	public void downshift() {
+		shifter.set(Value.kForward);
+	}
+
+	public void manualDrive(double speed, double turn) {
+		m_drive.arcadeDrive(speed, turn, true);
+	}
 }
