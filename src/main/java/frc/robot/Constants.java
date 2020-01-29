@@ -38,6 +38,11 @@ public final class Constants {
 	public static final int intakeDeployMotorPort = 16;
 	public static final int intakeDeployEncoderPort[] = {17, 18};
 
+	// Do controllers use same ports? ¯\_(ツ)_/¯
+	public static final int controllerPort = 19;
+	public static final int leftBumperPort = 20;
+	public static final int rightBumperPort = 21;
+
 	// Flywheel speed in RPM
 	public static final double flywheelSpeed = 2450.0;
 

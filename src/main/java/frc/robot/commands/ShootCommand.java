@@ -10,14 +10,14 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ShooterSubsystem;
 
-public class Shoot extends CommandBase {
+public class ShootCommand extends CommandBase {
 
 	private final ShooterSubsystem m_subsystem;
 
 	/**
-	 * Creates a new Shoot.
+	 * Creates a new ShootCommand.
 	 */
-	public Shoot(ShooterSubsystem subsystem) {
+	public ShootCommand(ShooterSubsystem subsystem) {
 		m_subsystem = subsystem;
 		addRequirements(subsystem);
 	}
