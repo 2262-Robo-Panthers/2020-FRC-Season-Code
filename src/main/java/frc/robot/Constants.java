@@ -25,18 +25,18 @@ public final class Constants {
 	public static final int rightMainPort = 3;
 	public static final int rightSlavePort = 4;
 
-	public static final int shifterPorts[] = {5, 6};
+	public static final int[] shifterPorts = {5, 6};
 
 	public static final int flywheelMotorPort = 7;
 	public static final int shooterHoodPort = 8;
-	public static final int shooterHoodEncoderPorts[] = {9, 10};
+	public static final int[] shooterHoodEncoderPorts = {9, 10};
 	public static final int topConveyorMotorPort = 11;
 	public static final int bottomConveyorMotorPort = 12;
-	public static final int shooterGatePorts[] = {13, 14};
+	public static final int[] shooterGatePorts = {13, 14};
 
 	public static final int intakeRollerPort = 15;
 	public static final int intakeDeployMotorPort = 16;
-	public static final int intakeDeployEncoderPort[] = {17, 18};
+	public static final int[] intakeDeployEncoderPort = {17, 18};
 
 	// Do controllers use the same ports? ¯\_(ツ)_/¯
 	public static final int controllerPort = 19;
