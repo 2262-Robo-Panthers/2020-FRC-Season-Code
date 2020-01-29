@@ -38,7 +38,7 @@ public final class Constants {
 	public static final int intakeDeployMotorPort = 16;
 	public static final int intakeDeployEncoderPort[] = {17, 18};
 
-	// Do controllers use same ports? ¯\_(ツ)_/¯
+	// Do controllers use the same ports? ¯\_(ツ)_/¯
 	public static final int controllerPort = 19;
 	public static final int leftBumperPort = 20;
 	public static final int rightBumperPort = 21;
@@ -60,10 +60,8 @@ public final class Constants {
 	public static final double hoodKI = 0.0;
 	public static final double hoodKD = 0.0;
 
-	// This is in Volts, crazy stuff
-	public static final double drivetrainMaxVoltage = 10.0;
-
-	// Seconds, crazy I know
-	public static final double drivetrainRampRate = 0.5;
+	// Voltage comp constants
+	public static final double drivetrainMaxVoltage = 10.0; // This is in Volts, crazy stuff
+	public static final double drivetrainRampRate = 0.5; // Seconds, crazy I know
 
 }
