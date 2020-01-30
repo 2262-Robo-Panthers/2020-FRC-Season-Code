@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ShootCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LiftSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 /**
@@ -34,6 +35,7 @@ public class RobotContainer {
 	private final DriveSubsystem m_driveSubsystem;
 	private final IntakeSubsystem m_intakeSubsystem;
 	private final ShooterSubsystem m_shooterSubsystem;
+	private final LiftSubsystem m_liftSubsystem;
 
 	private final XboxController m_controller;
 
@@ -56,6 +58,7 @@ public class RobotContainer {
 		m_driveSubsystem = new DriveSubsystem();
 		m_intakeSubsystem = new IntakeSubsystem();
 		m_shooterSubsystem = new ShooterSubsystem();
+		m_liftSubsystem = new LiftSubsystem();
 		m_controller = new XboxController(Constants.controllerPort);
 		leftBumper = new JoystickButton(m_controller, Button.kBumperLeft.value);
 		rightBumper = new JoystickButton(m_controller, Button.kBumperRight.value);

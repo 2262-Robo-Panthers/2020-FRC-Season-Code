@@ -38,6 +38,9 @@ public final class Constants {
 	public static final int intakeDeployMotorPort = 16;
 	public static final int[] intakeDeployEncoderPort = {17, 18};
 
+	public static final int liftMotorPort = 19;
+	public static final int[] liftSolenoidPorts = {20, 21};
+
 	// Do controllers use the same ports? ¯\_(ツ)_/¯
 	public static final int controllerPort = 19;
 	public static final int leftBumperPort = 20;
