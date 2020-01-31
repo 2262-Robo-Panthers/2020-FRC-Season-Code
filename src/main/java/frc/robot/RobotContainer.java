@@ -7,14 +7,26 @@
 
 package frc.robot;
 
+import java.util.List;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ShootCommand;
@@ -104,6 +116,44 @@ public class RobotContainer {
 	 * @return the command to run in autonomous
 	 */
 	public Command getAutonomousCommand() {
-		return teleopDrive;
+
+		DifferentialDriveVoltageConstraint voltageConstraint = new DifferentialDriveVoltageConstraint(
+			new SimpleMotorFeedforward(Constants.drivetrainKS, Constants.drivetrainKV,
+					Constants.drivetrainKA),
+			Constants.drivetrainKinematics,
+			Constants.drivetrainMaxVoltage
+		);
+
+		TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
+			Constants.maxVelocity,
+			Constants.maxAcceleration
+		);
+		trajectoryConfig.setKinematics(Constants.drivetrainKinematics);
+		trajectoryConfig.addConstraint(voltageConstraint);
+
+		Trajectory autoTrajectory = TrajectoryGenerator.generateTrajectory(
+			new Pose2d(),
+			List.of(
+				new Translation2d(1, 2),
+				new Translation2d(-1, 4)
+			),
+			new Pose2d(3, 3, new Rotation2d()),
+			trajectoryConfig
+		);
+
+		RamseteCommand ramsete = new RamseteCommand(
+			autoTrajectory,
+			m_driveSubsystem::getPose,
+			new RamseteController(),
+			new SimpleMotorFeedforward(Constants.drivetrainKS, Constants.drivetrainKV, Constants.drivetrainKA),
+			Constants.drivetrainKinematics,
+			m_driveSubsystem::getWheelSpeeds,
+			new PIDController(Constants.drivetrainKP, Constants.drivetrainKI, Constants.drivetrainKD),
+			new PIDController(Constants.drivetrainKP, Constants.drivetrainKI, Constants.drivetrainKD),
+			m_driveSubsystem::tankDriveVolts,
+			m_driveSubsystem
+		);
+
+		return ramsete;
 	}
 }
