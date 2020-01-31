@@ -40,7 +40,7 @@ public class RobotContainer {
 	private final LiftSubsystem m_liftSubsystem;
 	private final VisionSubsystem m_visionSubsystem;
 
-	private final Compressor m_compressor;
+	public final Compressor m_compressor;
 
 	private final XboxController m_controller;
 
