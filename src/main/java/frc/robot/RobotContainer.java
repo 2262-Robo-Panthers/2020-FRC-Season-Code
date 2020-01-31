@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
@@ -22,6 +23,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LiftSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -36,6 +38,9 @@ public class RobotContainer {
 	private final IntakeSubsystem m_intakeSubsystem;
 	private final ShooterSubsystem m_shooterSubsystem;
 	private final LiftSubsystem m_liftSubsystem;
+	private final VisionSubsystem m_visionSubsystem;
+
+	private final Compressor m_compressor;
 
 	private final XboxController m_controller;
 
@@ -59,6 +64,8 @@ public class RobotContainer {
 		m_intakeSubsystem = new IntakeSubsystem();
 		m_shooterSubsystem = new ShooterSubsystem();
 		m_liftSubsystem = new LiftSubsystem();
+		m_visionSubsystem = new VisionSubsystem();
+		m_compressor = new Compressor();
 		m_controller = new XboxController(Constants.controllerPort);
 		leftBumper = new JoystickButton(m_controller, Button.kBumperLeft.value);
 		rightBumper = new JoystickButton(m_controller, Button.kBumperRight.value);
