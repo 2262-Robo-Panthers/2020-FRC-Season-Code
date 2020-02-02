@@ -24,7 +24,7 @@ public class LiftSubsystem extends SubsystemBase {
 	 */
 	public LiftSubsystem() {
 		m_motor = new CANSparkMax(Constants.liftMotorPort, MotorType.kBrushless);
-		m_piston = new DoubleSolenoid(Constants.liftSolenoidPorts[0], Constants.liftSolenoidPorts[1]);
+		m_piston = new DoubleSolenoid(Constants.liftSolenoidChannels[0], Constants.liftSolenoidChannels[1]);
 	}
 
 	@Override

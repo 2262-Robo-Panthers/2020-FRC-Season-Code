@@ -25,7 +25,7 @@ public class IntakeSubsystem extends SubsystemBase {
 	public IntakeSubsystem() {
 		rollerMotor = new WPI_VictorSPX(Constants.intakeRollerPort);
 		deployMotor = new WPI_VictorSPX(Constants.intakeDeployMotorPort);
-		deployEncoder = new Encoder(Constants.intakeDeployEncoderPort[0], Constants.intakeDeployEncoderPort[1]);
+		deployEncoder = new Encoder(Constants.intakeDeployEncoderChannels[0], Constants.intakeDeployEncoderChannels[1]);
 	}
 
 	@Override

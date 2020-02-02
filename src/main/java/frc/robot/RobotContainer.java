@@ -65,7 +65,7 @@ public class RobotContainer {
 		m_shooterSubsystem = new ShooterSubsystem();
 		m_liftSubsystem = new LiftSubsystem();
 		m_visionSubsystem = new VisionSubsystem();
-		m_compressor = new Compressor();
+		m_compressor = new Compressor(Constants.PCMPort);
 		m_controller = new XboxController(Constants.controllerPort);
 		leftBumper = new JoystickButton(m_controller, Button.kBumperLeft.value);
 		rightBumper = new JoystickButton(m_controller, Button.kBumperRight.value);
@@ -111,6 +111,6 @@ public class RobotContainer {
 	 * @return the command to run in autonomous
 	 */
 	public Command getAutonomousCommand() {
-		return teleopDrive;
+		return null;
 	}
 }
