@@ -13,18 +13,16 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import frc.robot.Constants;
 
 public class ShooterSubsystem extends PIDSubsystem {
 
 	private final CANSparkMax m_wheelMotor;
-	private final SimpleMotorFeedforward ff = new SimpleMotorFeedforward(Constants.flywheelKS, Constants.flywheelKV);
 
 	private final WPI_VictorSPX m_hoodMotor;
 	private final Encoder m_hoodEncoder;
@@ -40,14 +38,14 @@ public class ShooterSubsystem extends PIDSubsystem {
 	public ShooterSubsystem() {
 		super(
 				// The PIDController used by the subsystem
-				new PIDController(Constants.flywheelKP, Constants.flywheelKI, Constants.flywheelKD));
+				new PIDController(Constants.flywheelKP, 0.0, 0.0));
 
 		m_wheelMotor = new CANSparkMax(Constants.flywheelMotorPort, MotorType.kBrushless);
 		m_hoodMotor = new WPI_VictorSPX(Constants.shooterHoodPort);
-		m_hoodEncoder = new Encoder(Constants.shooterHoodEncoderPorts[0], Constants.shooterHoodEncoderPorts[1]);
+		m_hoodEncoder = new Encoder(Constants.shooterHoodEncoderChannels[0], Constants.shooterHoodEncoderChannels[1]);
 		m_topConveyorMotor = new Spark(Constants.topConveyorMotorPort);
 		m_bottomConveyorMotor = new Spark(Constants.bottomConveyorMotorPort);
-		m_shooterGate = new DoubleSolenoid(Constants.shooterGatePorts[0], Constants.shooterGatePorts[1]);
+		m_shooterGate = new DoubleSolenoid(Constants.shooterGateChannels[0], Constants.shooterGateChannels[1]);
 
 		m_wheelMotor.setIdleMode(IdleMode.kCoast);
 		setGateClosed(true);
@@ -56,7 +54,7 @@ public class ShooterSubsystem extends PIDSubsystem {
 	@Override
 	public void useOutput(double output, double setpoint) {
 		// Use the output here
-		m_wheelMotor.setVoltage(ff.calculate(setpoint) + output);
+		m_wheelMotor.setVoltage(Constants.flyweelFF.calculate(setpoint) + output);
 	}
 
 	@Override

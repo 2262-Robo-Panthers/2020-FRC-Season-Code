@@ -40,7 +40,7 @@ public class DriveSubsystem extends SubsystemBase {
 		leftSlave = new WPI_TalonFX(Constants.leftSlavePort);
 		rightMain = new WPI_TalonFX(Constants.rightMainPort);
 		rightSlave = new WPI_TalonFX(Constants.rightSlavePort);
-		shifter = new DoubleSolenoid(Constants.shifterPorts[0], Constants.shifterPorts[1]);
+		shifter = new DoubleSolenoid(Constants.shifterChannels[0], Constants.shifterChannels[1]);
 		m_gyro = new ADXRS450_Gyro();
 		m_drive = new DifferentialDrive(leftMain, rightMain);
 		m_odometry = new DifferentialDriveOdometry(new Rotation2d());

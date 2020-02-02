@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -21,44 +22,42 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
  */
 public final class Constants {
 
-	// Ports 'n Stuff - BORING
-	public static final int leftMainPort = 1;
-	public static final int leftSlavePort = 2;
-	public static final int rightMainPort = 3;
-	public static final int rightSlavePort = 4;
+	// CAN devices
+	public static final int rightMainPort = 0;
+	public static final int rightSlavePort = 1;
+	public static final int leftMainPort = 2;
+	public static final int leftSlavePort = 3;
 
-	public static final int[] shifterPorts = { 5, 6 };
+	public static final int flywheelMotorPort = 4;
+	public static final int shooterHoodPort = 5;
 
-	public static final int flywheelMotorPort = 7;
-	public static final int shooterHoodPort = 8;
-	public static final int[] shooterHoodEncoderPorts = { 9, 10 };
-	public static final int topConveyorMotorPort = 11;
-	public static final int bottomConveyorMotorPort = 12;
-	public static final int[] shooterGatePorts = { 13, 14 };
+	public static final int intakeRollerPort = 6;
+	public static final int intakeDeployMotorPort = 7;
 
-	public static final int intakeRollerPort = 15;
-	public static final int intakeDeployMotorPort = 16;
-	public static final int[] intakeDeployEncoderPort = { 17, 18 };
+	public static final int liftMotorPort = 8;
 
-	public static final int liftMotorPort = 19;
-	public static final int[] liftSolenoidPorts = {20, 21};
+	public static final int PCMPort = 9;
 
-	// Do controllers use the same ports? ¯\_(ツ)_/¯
-	public static final int controllerPort = 19;
-	public static final int leftBumperPort = 20;
-	public static final int rightBumperPort = 21;
+	// PWM
+	public static final int topConveyorMotorPort = 0;
+	public static final int bottomConveyorMotorPort = 1;
 
-	// Flywheel speed in RPM
-	public static final double flywheelSpeed = 2450.0;
+	// Pneumatics
+	public static final int[] shifterChannels = { 0, 1 };
+	public static final int[] shooterGateChannels = { 2, 3 };
+	public static final int[] liftSolenoidChannels = { 4, 5 };
 
-	// Flywheel PID constants
+	// Encoders
+	public static final int[] shooterHoodEncoderChannels = { 0, 1 };
+	public static final int[] intakeDeployEncoderChannels = { 2, 3 };
+
+	// Xbox Controller
+	public static final int controllerPort = 0;
+
+	// Flywheel
+	public static final double flywheelSpeed = 1650.0;
 	public static final double flywheelKP = 1.0;
-	public static final double flywheelKI = 0.0;
-	public static final double flywheelKD = 0.0;
-
-	// Flywheel feedforward constants
-	public static final double flywheelKS = 0.0;
-	public static final double flywheelKV = 0.0;
+	public static final SimpleMotorFeedforward flyweelFF = new SimpleMotorFeedforward(0.0, 0.0, 0.0);
 
 	// So now there's PID on the shooter hood (probably)
 	public static final double hoodKP = 1.0;
