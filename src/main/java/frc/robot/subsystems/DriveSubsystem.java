@@ -31,8 +31,6 @@ public class DriveSubsystem extends SubsystemBase {
 
 	private final DifferentialDrive m_drive;
 
-	private final DifferentialDriveOdometry m_odometry;
-
 	public DriveSubsystem() {
 		leftMain = new WPI_TalonFX(Constants.leftMainPort);
 		leftSlave = new WPI_TalonFX(Constants.leftSlavePort);
@@ -41,7 +39,6 @@ public class DriveSubsystem extends SubsystemBase {
 		shifter = new DoubleSolenoid(Constants.shifterChannels[0], Constants.shifterChannels[1]);
 		m_gyro = new ADXRS450_Gyro();
 		m_drive = new DifferentialDrive(leftMain, rightMain);
-		m_odometry = new DifferentialDriveOdometry(new Rotation2d());
 
 		leftSlave.follow(leftMain);
 		rightSlave.follow(rightMain);
@@ -57,8 +54,6 @@ public class DriveSubsystem extends SubsystemBase {
 	public void periodic() {
 		// This method will be called once per scheduler run
 		Rotation2d gyroAngle = Rotation2d.fromDegrees(-m_gyro.getAngle());
-		m_odometry.update(gyroAngle, leftMain.getSensorCollection().getIntegratedSensorPosition(),
-				rightMain.getSensorCollection().getIntegratedSensorPosition());
 	}
 
 	public void upshift() {
