@@ -125,8 +125,7 @@ public class RobotContainer {
 	public Command getAutonomousCommand() {
 
 		DifferentialDriveVoltageConstraint voltageConstraint = new DifferentialDriveVoltageConstraint(
-			new SimpleMotorFeedforward(Constants.drivetrainKS, Constants.drivetrainKV,
-					Constants.drivetrainKA),
+			Constants.drivetrainFF,
 			Constants.drivetrainKinematics,
 			Constants.drivetrainMaxVoltage
 		);
@@ -152,11 +151,11 @@ public class RobotContainer {
 			autoTrajectory,
 			m_driveSubsystem::getPose,
 			new RamseteController(),
-			new SimpleMotorFeedforward(Constants.drivetrainKS, Constants.drivetrainKV, Constants.drivetrainKA),
+			Constants.drivetrainFF,
 			Constants.drivetrainKinematics,
 			m_driveSubsystem::getWheelSpeeds,
-			new PIDController(Constants.drivetrainKP, Constants.drivetrainKI, Constants.drivetrainKD),
-			new PIDController(Constants.drivetrainKP, Constants.drivetrainKI, Constants.drivetrainKD),
+			new PIDController(Constants.drivetrainKP, 0.0, 0.0),
+			new PIDController(Constants.drivetrainKP, 0.0, 0.0),
 			m_driveSubsystem::tankDriveVolts,
 			m_driveSubsystem
 		);

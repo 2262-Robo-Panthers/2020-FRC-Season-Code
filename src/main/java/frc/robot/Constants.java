@@ -70,14 +70,9 @@ public final class Constants {
 
 	// Drivetrain constants for Ramsyeet
 	public static final DifferentialDriveKinematics drivetrainKinematics = new DifferentialDriveKinematics(0.68);
-	public static final double drivetrainKS = 0.0;
-	public static final double drivetrainKV = 0.0;
-	public static final double drivetrainKA = 0.0;
+	public static final SimpleMotorFeedforward drivetrainFF = new SimpleMotorFeedforward(0.0, 0.0, 0.0);
 	public static final double drivetrainKP = 1.0;
-	public static final double drivetrainKI = 0.0;
-	public static final double drivetrainKD = 0.0;
-
-	public static final double maxVelocity = 15.0;
+	public static final double maxVelocity = 4.57;
 	public static final double maxAcceleration = 7.0;
 
 }
