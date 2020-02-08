@@ -16,11 +16,11 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class ShooterSubsystem extends PIDSubsystem {
+public class ShooterSubsystem extends SubsystemBase {
 
 	private final CANSparkMax m_wheelMotor;
 
@@ -36,53 +36,39 @@ public class ShooterSubsystem extends PIDSubsystem {
 	 * Creates a new ShooterSubsystem.
 	 */
 	public ShooterSubsystem() {
-		super(
-				// The PIDController used by the subsystem
-				new PIDController(Constants.flywheelKP, 0.0, 0.0));
 
 		m_wheelMotor = new CANSparkMax(Constants.flywheelMotorPort, MotorType.kBrushless);
 		m_hoodMotor = new WPI_VictorSPX(Constants.shooterHoodPort);
 		m_hoodEncoder = new Encoder(Constants.shooterHoodEncoderChannels[0], Constants.shooterHoodEncoderChannels[1]);
 		m_topConveyorMotor = new Spark(Constants.topConveyorMotorPort);
 		m_bottomConveyorMotor = new Spark(Constants.bottomConveyorMotorPort);
-		m_shooterGate = new DoubleSolenoid(Constants.shooterGateChannels[0], Constants.shooterGateChannels[1]);
+		m_shooterGate = new DoubleSolenoid(Constants.PCMPort, Constants.shooterGateChannels[0], Constants.shooterGateChannels[1]);
 
+		m_wheelMotor.setInverted(false);
 		m_wheelMotor.setIdleMode(IdleMode.kCoast);
+		m_wheelMotor.set(0.0);
 		setGateClosed(true);
-	}
-
-	@Override
-	public void useOutput(double output, double setpoint) {
-		// Use the output here
-		m_wheelMotor.setVoltage(Constants.flyweelFF.calculate(setpoint) + output);
-	}
-
-	@Override
-	public double getMeasurement() {
-		// Return the process variable measurement here
-		return m_wheelMotor.getEncoder().getVelocity();
-	}
-
-	public boolean isReady() {
-		return (getMeasurement() > getController().getSetpoint() - 50
-				&& getMeasurement() < getController().getSetpoint() + 50);
-	}
-
-	public double getHoodSetpoint() {
-		return 0.0;
 	}
 
 	public double getHoodDistance() {
 		return m_hoodEncoder.getDistance();
 	}
 
-	public void setHoodVoltage(double volts) {
-		m_hoodMotor.setVoltage(volts);
+	public void setHoodVolts(double volts) {
+		m_hoodMotor.setVoltage(-volts);
 	}
 
-	public void runConveyor(double speed) {
-		m_topConveyorMotor.setSpeed(speed);
-		m_bottomConveyorMotor.setSpeed(-speed);
+	public double getWheelVelocity() {
+		return -m_wheelMotor.getEncoder().getVelocity() / 60.0;
+	}
+
+	public void setWheelVolts(double voltage) {
+		m_wheelMotor.setVoltage(-voltage);
+	}
+
+	public void runConveyor() {
+		m_topConveyorMotor.setSpeed(-1.0);
+		m_bottomConveyorMotor.setSpeed(1.0);
 	}
 
 	public void setGateClosed(boolean setpoint) {
@@ -92,4 +78,10 @@ public class ShooterSubsystem extends PIDSubsystem {
 	public boolean isClosed() {
 		return m_shooterGate.get() == Value.kForward;
 	}
+
+	@Override
+	public void periodic() {
+		SmartDashboard.putNumber("RPM", m_wheelMotor.getEncoder().getVelocity());
+	}
+
 }

@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -32,4 +33,13 @@ public class IntakeSubsystem extends SubsystemBase {
 	public void periodic() {
 		// This method will be called once per scheduler run
 	}
+
+	public void spinRoller() {
+		rollerMotor.set(ControlMode.PercentOutput, -1.0);
+	}
+
+	public void runDeployMotor(boolean backward) {
+		deployMotor.set(ControlMode.PercentOutput, backward ? -1.0 : 1.0);
+	}
+
 }
