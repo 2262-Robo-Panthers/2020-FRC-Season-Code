@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -25,11 +24,11 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ShootCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -46,62 +45,83 @@ import frc.robot.subsystems.VisionSubsystem;
  */
 public class RobotContainer {
 	// The robot's subsystems and commands are defined here...
+	public final Compressor m_compressor;
+
+	private final XboxController m_controller;
+	private final JoystickButton leftBumper;
+	private final JoystickButton rightBumper;
+	private final JoystickButton buttonA;
+	private final JoystickButton buttonB;
+	private final JoystickButton buttonX;
+	private final JoystickButton buttonY;
+	private final JoystickButton startButton;
+	private final JoystickButton backButton;
+	private final Trigger dPadUp;
+	private final Trigger dPadRight;
+	private final Trigger dPadDown;
+	private final Trigger dPadLeft;
+
 	private final DriveSubsystem m_driveSubsystem;
 	private final IntakeSubsystem m_intakeSubsystem;
 	private final ShooterSubsystem m_shooterSubsystem;
 	private final LiftSubsystem m_liftSubsystem;
 	private final VisionSubsystem m_visionSubsystem;
 
-	public final Compressor m_compressor;
-
-	private final XboxController m_controller;
-
-	private final JoystickButton leftBumper;
-	private final JoystickButton rightBumper;
-	private final JoystickButton buttonA;
-	private final JoystickButton buttonB;
-
-	private final RunCommand teleopDrive;
-	private final InstantCommand upshift;
-	private final InstantCommand downshift;
 	private final ShootCommand shoot;
-	private final PIDCommand moveHood;
+	private final PIDCommand flywheelSlow;
+	private final PIDCommand flywheelFast;
 
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
 	public RobotContainer() {
 
-		m_driveSubsystem = new DriveSubsystem();
-		m_intakeSubsystem = new IntakeSubsystem();
-		m_shooterSubsystem = new ShooterSubsystem();
-		m_liftSubsystem = new LiftSubsystem();
-		m_visionSubsystem = new VisionSubsystem();
-		m_compressor = new Compressor(Constants.PCMPort);
 		m_controller = new XboxController(Constants.controllerPort);
 		leftBumper = new JoystickButton(m_controller, Button.kBumperLeft.value);
 		rightBumper = new JoystickButton(m_controller, Button.kBumperRight.value);
 		buttonA = new JoystickButton(m_controller, Button.kA.value);
 		buttonB = new JoystickButton(m_controller, Button.kB.value);
-		teleopDrive = new RunCommand(
-			() -> m_driveSubsystem.manualDrive(m_controller.getY(Hand.kLeft), m_controller.getX(Hand.kRight)),
-			m_driveSubsystem);
-		upshift = new InstantCommand(m_driveSubsystem::upshift, m_driveSubsystem);
-		downshift = new InstantCommand(m_driveSubsystem::downshift, m_driveSubsystem);
+		buttonX = new JoystickButton(m_controller, Button.kX.value);
+		buttonY = new JoystickButton(m_controller, Button.kY.value);
+		startButton = new JoystickButton(m_controller, Button.kStart.value);
+		backButton = new JoystickButton(m_controller, Button.kBack.value);
+		dPadUp = new Trigger(() -> {return m_controller.getPOV() == 0;});
+		dPadRight = new Trigger(() -> {return m_controller.getPOV() == 90;});
+		dPadDown = new Trigger(() -> {return m_controller.getPOV() == 180;});
+		dPadLeft = new Trigger(() -> {return m_controller.getPOV() == 270;});
+		m_driveSubsystem = new DriveSubsystem(
+			() -> {return m_controller.getY(Hand.kLeft);},
+			() -> {return -m_controller.getX(Hand.kLeft);}
+		);
+		m_intakeSubsystem = new IntakeSubsystem();
+		m_shooterSubsystem = new ShooterSubsystem();
+		m_liftSubsystem = new LiftSubsystem(
+			() -> {return m_controller.getTriggerAxis(Hand.kLeft);},
+			() -> {return m_controller.getTriggerAxis(Hand.kRight);}
+		);
+		m_visionSubsystem = new VisionSubsystem();
+		m_compressor = new Compressor(Constants.PCMPort);
 		shoot = new ShootCommand(m_shooterSubsystem);
-		moveHood = new PIDCommand(
-			new PIDController(Constants.hoodKP, Constants.hoodKI, Constants.hoodKD),
-			m_shooterSubsystem::getHoodDistance,
-			m_shooterSubsystem::getHoodSetpoint,
+		flywheelSlow = new PIDCommand(
+			new PIDController(Constants.flywheelKP, 0.0, 0.0),
+			m_shooterSubsystem::getWheelVelocity,
+			Constants.flywheelLowSpeed,
 			(output) -> {
-				m_shooterSubsystem.setHoodVoltage(output);
-			},
-			m_shooterSubsystem);
+				m_shooterSubsystem.setWheelVolts(output + Constants.flywheelFF.calculate(Constants.flywheelLowSpeed));
+			}
+		);
+		flywheelFast = new PIDCommand(
+			new PIDController(Constants.flywheelKP, 0.0, 0.0),
+			m_shooterSubsystem::getWheelVelocity,
+			Constants.flywheelHighSpeed,
+			(output) -> {
+				m_shooterSubsystem.setWheelVolts(output + Constants.flywheelFF.calculate(Constants.flywheelHighSpeed));
+			}
+		);
 
 		// Configure the button bindings
 		configureButtonBindings();
 
-		m_driveSubsystem.setDefaultCommand(teleopDrive);
 	}
 
 	/**
@@ -111,10 +131,23 @@ public class RobotContainer {
 	 * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
 	 */
 	private void configureButtonBindings() {
-		leftBumper.whenPressed(downshift);
-		rightBumper.whenPressed(upshift);
-		buttonA.whenPressed(shoot);
-		buttonB.whenPressed(moveHood);
+		leftBumper.whenPressed(m_driveSubsystem::downshift);
+		rightBumper.whenPressed(m_driveSubsystem::upshift);
+		dPadLeft.whenActive(flywheelSlow);
+		dPadRight.whenActive(flywheelFast);
+		dPadDown.whileActiveContinuous(() -> {m_intakeSubsystem.runDeployMotor(false);});
+		dPadUp.whileActiveContinuous(() -> {m_intakeSubsystem.runDeployMotor(true);});
+		buttonA.whileHeld(m_shooterSubsystem::runConveyor);
+		buttonB.whenPressed(
+			() -> {
+				m_shooterSubsystem.setWheelVolts(0.0);
+				if (flywheelSlow.isScheduled()) flywheelSlow.end(false);
+				if (flywheelFast.isScheduled()) flywheelFast.end(false);
+			}
+		);
+		buttonX.toggleWhenPressed(new RunCommand(m_intakeSubsystem::spinRoller));
+		startButton.whenPressed(() -> {m_liftSubsystem.setPistonExtended(true);});
+		backButton.whenPressed(() -> {m_liftSubsystem.setPistonExtended(false);});
 	}
 
 	/**

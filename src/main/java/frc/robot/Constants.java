@@ -31,8 +31,8 @@ public final class Constants {
 	public static final int flywheelMotorPort = 4;
 	public static final int shooterHoodPort = 5;
 
-	public static final int intakeRollerPort = 6;
-	public static final int intakeDeployMotorPort = 7;
+	public static final int intakeDeployMotorPort = 6;
+	public static final int intakeRollerPort = 7;
 
 	public static final int liftMotorPort = 8;
 
@@ -43,9 +43,9 @@ public final class Constants {
 	public static final int bottomConveyorMotorPort = 1;
 
 	// Pneumatics
-	public static final int[] shifterChannels = { 0, 1 };
+	public static final int shifterChannel = 0;
 	public static final int[] shooterGateChannels = { 2, 3 };
-	public static final int[] liftSolenoidChannels = { 4, 5 };
+	public static final int liftSolenoidChannel = 4;
 
 	// Encoders
 	public static final int[] shooterHoodEncoderChannels = { 0, 1 };
@@ -55,18 +55,14 @@ public final class Constants {
 	public static final int controllerPort = 0;
 
 	// Flywheel
-	public static final double flywheelSpeed = 1650.0;
-	public static final double flywheelKP = 1.0;
-	public static final SimpleMotorFeedforward flyweelFF = new SimpleMotorFeedforward(0.0, 0.0, 0.0);
-
-	// So now there's PID on the shooter hood (probably)
-	public static final double hoodKP = 1.0;
-	public static final double hoodKI = 0.0;
-	public static final double hoodKD = 0.0;
+	public static final SimpleMotorFeedforward flywheelFF = new SimpleMotorFeedforward(0.0313, 0.138, 0.0738);
+	public static final double flywheelKP = 0.0;
+	public static final double flywheelLowSpeed = 1650.0 / 60.0;
+	public static final double flywheelHighSpeed = 4500.0 / 60.0;
 
 	// Voltage comp constants
-	public static final double drivetrainMaxVoltage = 10.0; // This is in Volts, crazy stuff
-	public static final double drivetrainRampRate = 0.5; // Seconds, crazy I know
+	public static final double drivetrainMaxVoltage = 12.0; // This is in Volts, crazy stuff
+	public static final double drivetrainRampRate = 0.2; // Seconds, crazy I know
 
 	// Drivetrain constants for Ramsyeet
 	public static final DifferentialDriveKinematics drivetrainKinematics = new DifferentialDriveKinematics(0.68);
