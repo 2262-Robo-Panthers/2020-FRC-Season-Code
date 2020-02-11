@@ -9,6 +9,7 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
@@ -46,6 +47,10 @@ public class DriveSubsystem extends SubsystemBase {
 
 		leftSlave.follow(leftMain);
 		rightSlave.follow(rightMain);
+		leftMain.setNeutralMode(NeutralMode.Brake);
+		leftSlave.setNeutralMode(NeutralMode.Brake);
+		rightMain.setNeutralMode(NeutralMode.Brake);
+		rightSlave.setNeutralMode(NeutralMode.Brake);
 		leftMain.configVoltageCompSaturation(Constants.drivetrainMaxVoltage);
 		rightMain.configVoltageCompSaturation(Constants.drivetrainMaxVoltage);
 		leftMain.configOpenloopRamp(Constants.drivetrainRampRate);
