@@ -135,8 +135,8 @@ public class RobotContainer {
 		rightBumper.whenPressed(m_driveSubsystem::upshift);
 		dPadLeft.whenActive(flywheelSlow);
 		dPadRight.whenActive(flywheelFast);
-		dPadDown.whileActiveContinuous(() -> {m_intakeSubsystem.runDeployMotor(false);});
-		dPadUp.whileActiveContinuous(() -> {m_intakeSubsystem.runDeployMotor(true);});
+		dPadDown.whileActiveContinuous(() -> m_intakeSubsystem.runDeployMotor(false));
+		dPadUp.whileActiveContinuous(() -> m_intakeSubsystem.runDeployMotor(true));
 		buttonA.whileHeld(m_shooterSubsystem::runConveyor);
 		buttonB.whenPressed(
 			() -> {
@@ -146,8 +146,8 @@ public class RobotContainer {
 			}
 		);
 		buttonX.toggleWhenPressed(new RunCommand(m_intakeSubsystem::spinRoller));
-		startButton.whenPressed(() -> {m_liftSubsystem.setPistonExtended(true);});
-		backButton.whenPressed(() -> {m_liftSubsystem.setPistonExtended(false);});
+		startButton.whenPressed(() -> m_liftSubsystem.setPistonExtended(true));
+		backButton.whenPressed(() -> m_liftSubsystem.setPistonExtended(false));
 	}
 
 	/**
