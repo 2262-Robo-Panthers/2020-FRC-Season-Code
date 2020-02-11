@@ -58,7 +58,6 @@ public final class Constants {
 	public static final SimpleMotorFeedforward flywheelFF = new SimpleMotorFeedforward(0.0313, 0.138, 0.0738);
 	public static final double flywheelKP = 0.0;
 	public static final double flywheelLowSpeed = 1650.0 / 60.0;
-	public static final double flywheelHighSpeed = 4500.0 / 60.0;
 
 	// Voltage comp constants
 	public static final double drivetrainMaxVoltage = 12.0; // This is in Volts, crazy stuff
