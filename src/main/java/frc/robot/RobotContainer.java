@@ -58,7 +58,7 @@ public class RobotContainer {
 
 	private final ShootCommand shoot;
 	private final PIDCommand flywheelSlow;
-	private final PIDCommand flywheelFast;
+	private final RunCommand flywheelFast;
 
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -99,15 +99,7 @@ public class RobotContainer {
 				m_shooterSubsystem.setWheelVolts(output + Constants.flywheelFF.calculate(Constants.flywheelLowSpeed));
 			}
 		);
-		flywheelFast = new PIDCommand(
-			new PIDController(Constants.flywheelKP, 0.0, 0.0),
-			m_shooterSubsystem::getWheelVelocity,
-			Constants.flywheelHighSpeed,
-			(output) -> {
-				m_shooterSubsystem.setWheelVolts(output + Constants.flywheelFF.calculate(Constants.flywheelHighSpeed));
-			}
-		);
-
+		flywheelFast = new RunCommand(() -> m_shooterSubsystem.setWheelVolts(12));
 		// Configure the button bindings
 		configureButtonBindings();
 
