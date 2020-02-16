@@ -31,8 +31,8 @@ public final class Constants {
 	public static final int flywheelMotorPort = 4;
 	public static final int shooterHoodPort = 5;
 
-	public static final int intakeDeployMotorPort = 6;
-	public static final int intakeRollerPort = 7;
+	public static final int intakeRollerPort = 6;
+	public static final int intakeDeployMotorPort = 7;
 
 	public static final int liftMotorPort = 8;
 
@@ -42,8 +42,13 @@ public final class Constants {
 	public static final int topConveyorMotorPort = 0;
 	public static final int bottomConveyorMotorPort = 1;
 
+	// DIO
+	public static final int topConveyorSensorPort = 0;
+	public static final int bottomConveyorSensorPort = 1;
+
 	// Pneumatics
 	public static final int shifterChannel = 0;
+	public static final int lightChannel = 1;
 	public static final int[] shooterGateChannels = { 2, 3 };
 	public static final int liftSolenoidChannel = 4;
 

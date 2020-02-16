@@ -10,15 +10,19 @@ package frc.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class VisionSubsystem extends SubsystemBase {
 
 	private final NetworkTable m_table;
 	private final NetworkTableEntry poseEntry;
 	private final NetworkTableEntry latencyEntry;
+
+	private final Solenoid m_ringLight;
 
 	/**
 	 * Creates a new VisionSubsystem.
@@ -27,6 +31,10 @@ public class VisionSubsystem extends SubsystemBase {
 		m_table = NetworkTableInstance.getDefault().getTable("chameleon-vision/Microsoft_LifeCam_HD_3000");
 		poseEntry = m_table.getEntry("targetPose");
 		latencyEntry = m_table.getEntry("latency");
+
+		m_ringLight = new Solenoid(Constants.PCMPort, Constants.lightChannel);
+
+		toggleRingLight();
 	}
 
 	@Override
@@ -41,6 +49,10 @@ public class VisionSubsystem extends SubsystemBase {
 
 	public double getLatency() {
 		return latencyEntry.getDouble(0.0);
+	}
+
+	public void toggleRingLight() {
+		m_ringLight.set(!m_ringLight.get());
 	}
 
 }

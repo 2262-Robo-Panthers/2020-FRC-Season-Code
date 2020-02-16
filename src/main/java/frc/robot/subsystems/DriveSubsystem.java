@@ -90,18 +90,21 @@ public class DriveSubsystem extends SubsystemBase {
 		shifter.set(false);
 	}
 
-	public void tankDriveVolts(double left, double right) {
-		leftMain.setVoltage(left);
-		rightMain.setVoltage(right);
-	}
-
 	public Pose2d getPose() {
 		return m_odometry.getPoseMeters();
 	}
 
 	public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-		return new DifferentialDriveWheelSpeeds(leftMain.getSelectedSensorVelocity(),
-				rightMain.getSelectedSensorVelocity());
+		return new DifferentialDriveWheelSpeeds(leftMain.getSelectedSensorVelocity(), rightMain.getSelectedSensorVelocity());
+	}
+
+	public double getAngle() {
+		return m_gyro.getAngle();
+	}
+
+	public void tankDriveVolts(double leftSpeed, double rightSpeed) {
+		leftMain.setVoltage(leftSpeed);
+		rightMain.setVoltage(rightSpeed);
 	}
 
 }
