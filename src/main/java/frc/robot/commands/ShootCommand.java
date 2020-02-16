@@ -19,27 +19,29 @@ public class ShootCommand extends CommandBase {
 	 */
 	public ShootCommand(ShooterSubsystem subsystem) {
 		m_subsystem = subsystem;
-		addRequirements(subsystem);
 	}
 
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
+		m_subsystem.setGateClosed(false);
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
 	public void execute() {
+		m_subsystem.runConveyor();
 	}
 
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted) {
+		m_subsystem.setGateClosed(true);
 	}
 
 	// Returns true when the command should end.
 	@Override
 	public boolean isFinished() {
-		return false;
+		return m_subsystem.getTopSensor();
 	}
 }

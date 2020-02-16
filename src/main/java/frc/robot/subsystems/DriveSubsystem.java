@@ -80,4 +80,13 @@ public class DriveSubsystem extends SubsystemBase {
 		shifter.set(false);
 	}
 
+	public double getAngle() {
+		return m_gyro.getAngle();
+	}
+
+	public void tankDriveVolts(double leftSpeed, double rightSpeed) {
+		leftMain.setVoltage(leftSpeed);
+		rightMain.setVoltage(rightSpeed);
+	}
+
 }

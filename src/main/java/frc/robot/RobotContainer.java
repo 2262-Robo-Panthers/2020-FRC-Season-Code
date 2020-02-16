@@ -57,7 +57,7 @@ public class RobotContainer {
 	private final VisionSubsystem m_visionSubsystem;
 
 	private final ShootCommand shoot;
-	private final PIDCommand flywheelSlow;
+	private final PIDCommand flywheelPID;
 	private final RunCommand flywheelFast;
 
 	/**
@@ -74,24 +74,24 @@ public class RobotContainer {
 		buttonY = new JoystickButton(m_controller, Button.kY.value);
 		startButton = new JoystickButton(m_controller, Button.kStart.value);
 		backButton = new JoystickButton(m_controller, Button.kBack.value);
-		dPadUp = new Trigger(() -> {return m_controller.getPOV() == 0;});
-		dPadRight = new Trigger(() -> {return m_controller.getPOV() == 90;});
-		dPadDown = new Trigger(() -> {return m_controller.getPOV() == 180;});
-		dPadLeft = new Trigger(() -> {return m_controller.getPOV() == 270;});
+		dPadUp = new Trigger(() -> m_controller.getPOV() == 0);
+		dPadRight = new Trigger(() -> m_controller.getPOV() == 90);
+		dPadDown = new Trigger(() -> m_controller.getPOV() == 180);
+		dPadLeft = new Trigger(() -> m_controller.getPOV() == 270);
 		m_driveSubsystem = new DriveSubsystem(
-			() -> {return m_controller.getY(Hand.kLeft);},
-			() -> {return -m_controller.getX(Hand.kLeft);}
+			() -> m_controller.getY(Hand.kLeft),
+			() -> -m_controller.getX(Hand.kLeft)
 		);
 		m_intakeSubsystem = new IntakeSubsystem();
-		m_shooterSubsystem = new ShooterSubsystem();
+		m_shooterSubsystem = new ShooterSubsystem(() -> m_controller.getY(Hand.kRight));
 		m_liftSubsystem = new LiftSubsystem(
-			() -> {return m_controller.getTriggerAxis(Hand.kLeft);},
-			() -> {return m_controller.getTriggerAxis(Hand.kRight);}
+			() -> m_controller.getTriggerAxis(Hand.kLeft),
+			() -> m_controller.getTriggerAxis(Hand.kRight)
 		);
 		m_visionSubsystem = new VisionSubsystem();
 		m_compressor = new Compressor(Constants.PCMPort);
 		shoot = new ShootCommand(m_shooterSubsystem);
-		flywheelSlow = new PIDCommand(
+		flywheelPID = new PIDCommand(
 			new PIDController(Constants.flywheelKP, 0.0, 0.0),
 			m_shooterSubsystem::getWheelVelocity,
 			Constants.flywheelLowSpeed,
@@ -114,19 +114,22 @@ public class RobotContainer {
 	private void configureButtonBindings() {
 		leftBumper.whenPressed(m_driveSubsystem::downshift);
 		rightBumper.whenPressed(m_driveSubsystem::upshift);
-		dPadLeft.whenActive(flywheelSlow);
+		dPadLeft.whenActive(flywheelPID);
 		dPadRight.whenActive(flywheelFast);
-		dPadDown.whileActiveContinuous(() -> m_intakeSubsystem.runDeployMotor(false));
-		dPadUp.whileActiveContinuous(() -> m_intakeSubsystem.runDeployMotor(true));
-		buttonA.whileHeld(m_shooterSubsystem::runConveyor);
+		dPadDown.whenActive(() -> m_intakeSubsystem.runDeployMotor(false))
+			.whenInactive(m_intakeSubsystem::stopDeployMotor);
+		dPadUp.whenActive(() -> m_intakeSubsystem.runDeployMotor(true))
+			.whenInactive(m_intakeSubsystem::stopDeployMotor);
+		buttonA.whenPressed(shoot);
 		buttonB.whenPressed(
 			() -> {
 				m_shooterSubsystem.setWheelVolts(0.0);
-				if (flywheelSlow.isScheduled()) flywheelSlow.end(false);
+				if (flywheelPID.isScheduled()) flywheelPID.end(false);
 				if (flywheelFast.isScheduled()) flywheelFast.end(false);
 			}
 		);
-		buttonX.toggleWhenPressed(new RunCommand(m_intakeSubsystem::spinRoller));
+		buttonX.whenPressed(m_intakeSubsystem::spinRoller);
+		buttonY.whenPressed(m_intakeSubsystem::stopRoller);
 		startButton.whenPressed(() -> m_liftSubsystem.setPistonExtended(true));
 		backButton.whenPressed(() -> m_liftSubsystem.setPistonExtended(false));
 	}

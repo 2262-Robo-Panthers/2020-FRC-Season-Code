@@ -7,20 +7,24 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ShooterSubsystem extends SubsystemBase {
+
+	private final DoubleSupplier hoodSupplier;
 
 	private final CANSparkMax m_wheelMotor;
 
@@ -32,10 +36,15 @@ public class ShooterSubsystem extends SubsystemBase {
 
 	private final DoubleSolenoid m_shooterGate;
 
+	private final DigitalInput m_topSensor;
+	private final DigitalInput m_bottomSensor;
+
 	/**
 	 * Creates a new ShooterSubsystem.
 	 */
-	public ShooterSubsystem() {
+	public ShooterSubsystem(DoubleSupplier hoodSupplier) {
+
+		this.hoodSupplier = hoodSupplier;
 
 		m_wheelMotor = new CANSparkMax(Constants.flywheelMotorPort, MotorType.kBrushless);
 		m_hoodMotor = new WPI_VictorSPX(Constants.shooterHoodPort);
@@ -43,6 +52,8 @@ public class ShooterSubsystem extends SubsystemBase {
 		m_topConveyorMotor = new Spark(Constants.topConveyorMotorPort);
 		m_bottomConveyorMotor = new Spark(Constants.bottomConveyorMotorPort);
 		m_shooterGate = new DoubleSolenoid(Constants.PCMPort, Constants.shooterGateChannels[0], Constants.shooterGateChannels[1]);
+		m_topSensor = new DigitalInput(Constants.topConveyorSensorPort);
+		m_bottomSensor = new DigitalInput(Constants.bottomConveyorSensorPort);
 
 		m_wheelMotor.setInverted(false);
 		m_wheelMotor.setIdleMode(IdleMode.kCoast);
@@ -75,13 +86,18 @@ public class ShooterSubsystem extends SubsystemBase {
 		m_shooterGate.set(setpoint ? Value.kForward : Value.kReverse);
 	}
 
-	public boolean isClosed() {
-		return m_shooterGate.get() == Value.kForward;
-	}
-
 	@Override
 	public void periodic() {
-		SmartDashboard.putNumber("RPM", m_wheelMotor.getEncoder().getVelocity());
+		m_hoodMotor.set(hoodSupplier.getAsDouble());
+		if (m_topSensor.get()) runConveyor();
+	}
+
+	public boolean getTopSensor() {
+		return m_topSensor.get();
+	}
+
+	public boolean getBottomSensor() {
+		return m_bottomSensor.get();
 	}
 
 }
