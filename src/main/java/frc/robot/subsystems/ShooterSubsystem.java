@@ -14,22 +14,26 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ShooterSubsystem extends SubsystemBase {
+
+	private final ShuffleboardTab tab;
 
 	private final DoubleSupplier hoodSupplier;
 
 	private final CANSparkMax m_wheelMotor;
 
 	private final WPI_VictorSPX m_hoodMotor;
-	private final Encoder m_hoodEncoder;
 
 	private final Spark m_topConveyorMotor;
 	private final Spark m_bottomConveyorMotor;
@@ -39,21 +43,36 @@ public class ShooterSubsystem extends SubsystemBase {
 	private final DigitalInput m_topSensor;
 	private final DigitalInput m_bottomSensor;
 
+	private final PIDController m_controller;
+
+	private final NetworkTableEntry setpointEntry;
+	private final NetworkTableEntry RPMEntry;
+	private final NetworkTableEntry topSensorEntry;
+	private final NetworkTableEntry bottomSensorEntry;
+
 	/**
 	 * Creates a new ShooterSubsystem.
 	 */
 	public ShooterSubsystem(DoubleSupplier hoodSupplier) {
 
+		tab = Shuffleboard.getTab("Robot");
+
 		this.hoodSupplier = hoodSupplier;
 
 		m_wheelMotor = new CANSparkMax(Constants.flywheelMotorPort, MotorType.kBrushless);
 		m_hoodMotor = new WPI_VictorSPX(Constants.shooterHoodPort);
-		m_hoodEncoder = new Encoder(Constants.shooterHoodEncoderChannels[0], Constants.shooterHoodEncoderChannels[1]);
 		m_topConveyorMotor = new Spark(Constants.topConveyorMotorPort);
 		m_bottomConveyorMotor = new Spark(Constants.bottomConveyorMotorPort);
 		m_shooterGate = new DoubleSolenoid(Constants.PCMPort, Constants.shooterGateChannels[0], Constants.shooterGateChannels[1]);
 		m_topSensor = new DigitalInput(Constants.topConveyorSensorPort);
 		m_bottomSensor = new DigitalInput(Constants.bottomConveyorSensorPort);
+		m_controller = new PIDController(Constants.flywheelKP, 0.0, 0.0);
+
+		setpointEntry = tab.add("Flywheel Setpoint", Constants.flywheelLowSpeed).getEntry();
+		RPMEntry = tab.add("Flywheel RPM", m_wheelMotor.getEncoder().getVelocity()).getEntry();
+		topSensorEntry = tab.add("Top Sensor", getTopSensor()).getEntry();
+		bottomSensorEntry = tab.add("Bottom Sensor", getBottomSensor()).getEntry();
+		tab.add("Flywheel PID", m_controller);
 
 		m_wheelMotor.setInverted(false);
 		m_wheelMotor.setIdleMode(IdleMode.kCoast);
@@ -61,8 +80,16 @@ public class ShooterSubsystem extends SubsystemBase {
 		setGateClosed(true);
 	}
 
-	public double getHoodDistance() {
-		return m_hoodEncoder.getDistance();
+	@Override
+	public void periodic() {
+		m_hoodMotor.set(hoodSupplier.getAsDouble());
+		updateShuffleboard();
+	}
+
+	private void updateShuffleboard() {
+		RPMEntry.setDouble(-m_wheelMotor.getEncoder().getVelocity());
+		topSensorEntry.setBoolean(getTopSensor());
+		bottomSensorEntry.setBoolean(getBottomSensor());
 	}
 
 	public void setHoodVolts(double volts) {
@@ -86,10 +113,12 @@ public class ShooterSubsystem extends SubsystemBase {
 		m_shooterGate.set(setpoint ? Value.kForward : Value.kReverse);
 	}
 
-	@Override
-	public void periodic() {
-		m_hoodMotor.set(hoodSupplier.getAsDouble());
-		if (m_topSensor.get()) runConveyor();
+	public double getSetpoint() {
+		return setpointEntry.getDouble(0.0) / 60.0;
+	}
+
+	public PIDController getController() {
+		return m_controller;
 	}
 
 	public boolean getTopSensor() {

@@ -42,18 +42,14 @@ public final class Constants {
 	public static final int bottomConveyorMotorPort = 1;
 
 	// DIO
-	public static final int topConveyorSensorPort = 0;
-	public static final int bottomConveyorSensorPort = 1;
+	public static final int bottomConveyorSensorPort = 0;
+	public static final int topConveyorSensorPort = 1;
+	public static final int[] intakeDeployEncoderChannels = { 2, 3 };
 
 	// Pneumatics
 	public static final int shifterChannel = 0;
-	public static final int lightChannel = 1;
 	public static final int[] shooterGateChannels = { 2, 3 };
 	public static final int liftSolenoidChannel = 4;
-
-	// Encoders
-	public static final int[] shooterHoodEncoderChannels = { 0, 1 };
-	public static final int[] intakeDeployEncoderChannels = { 2, 3 };
 
 	// Xbox Controller
 	public static final int controllerPort = 0;

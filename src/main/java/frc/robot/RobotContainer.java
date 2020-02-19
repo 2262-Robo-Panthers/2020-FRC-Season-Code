@@ -12,13 +12,13 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ShootCommand;
+import frc.robot.commands.TurnToGoalCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LiftSubsystem;
@@ -57,6 +57,7 @@ public class RobotContainer {
 	private final VisionSubsystem m_visionSubsystem;
 
 	private final ShootCommand shoot;
+	private final TurnToGoalCommand turnToGoal;
 	private final PIDCommand flywheelPID;
 	private final RunCommand flywheelFast;
 
@@ -91,13 +92,12 @@ public class RobotContainer {
 		m_visionSubsystem = new VisionSubsystem();
 		m_compressor = new Compressor(Constants.PCMPort);
 		shoot = new ShootCommand(m_shooterSubsystem);
+		turnToGoal = new TurnToGoalCommand(m_driveSubsystem, m_visionSubsystem);
 		flywheelPID = new PIDCommand(
-			new PIDController(Constants.flywheelKP, 0.0, 0.0),
+			m_shooterSubsystem.getController(),
 			m_shooterSubsystem::getWheelVelocity,
-			Constants.flywheelLowSpeed,
-			(output) -> {
-				m_shooterSubsystem.setWheelVolts(output + Constants.flywheelFF.calculate(Constants.flywheelLowSpeed));
-			}
+			m_shooterSubsystem::getSetpoint,
+			output -> m_shooterSubsystem.setWheelVolts(output + Constants.flywheelFF.calculate(m_shooterSubsystem.getSetpoint()))
 		);
 		flywheelFast = new RunCommand(() -> m_shooterSubsystem.setWheelVolts(12));
 		// Configure the button bindings
@@ -128,8 +128,8 @@ public class RobotContainer {
 				if (flywheelFast.isScheduled()) flywheelFast.end(false);
 			}
 		);
-		buttonX.whenPressed(m_intakeSubsystem::spinRoller);
-		buttonY.whenPressed(m_intakeSubsystem::stopRoller);
+		buttonX.toggleWhenPressed(new RunCommand(m_intakeSubsystem::spinRoller));
+		buttonY.whenPressed(turnToGoal);
 		startButton.whenPressed(() -> m_liftSubsystem.setPistonExtended(true));
 		backButton.whenPressed(() -> m_liftSubsystem.setPistonExtended(false));
 	}
