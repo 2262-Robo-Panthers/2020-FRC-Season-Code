@@ -10,11 +10,9 @@ package frc.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class VisionSubsystem extends SubsystemBase {
 
@@ -39,7 +37,7 @@ public class VisionSubsystem extends SubsystemBase {
 	}
 
 	public Pose2d getTargetPose() {
-		double[] poseArray = poseEntry.getDoubleArray((double[])null);
+		double[] poseArray = poseEntry.getDoubleArray(new double[3]);
 		return new Pose2d(poseArray[0], poseArray[1], Rotation2d.fromDegrees(poseArray[2]));
 	}
 
