@@ -28,7 +28,6 @@ public class LiftSubsystem extends SubsystemBase {
 	 * Creates a new LiftSubsystem.
 	 */
 	public LiftSubsystem(DoubleSupplier leftTrigger, DoubleSupplier rightTrigger) {
-
 		this.leftTrigger = leftTrigger;
 		this.rightTrigger = rightTrigger;
 

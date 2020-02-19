@@ -9,10 +9,11 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import com.analog.adis16448.frc.ADIS16448_IMU;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -20,10 +21,17 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class DriveSubsystem extends SubsystemBase {
+
+	private final ShuffleboardTab tab;
+	private final NetworkTableEntry brakeEntry;
+	private final NetworkTableEntry voltageEntry;
+	private final NetworkTableEntry rampEntry;
 
 	private final DoubleSupplier speedSupplier;
 	private final DoubleSupplier turnSupplier;
@@ -43,6 +51,8 @@ public class DriveSubsystem extends SubsystemBase {
 
 	public DriveSubsystem(DoubleSupplier speedSupplier, DoubleSupplier turnSupplier) {
 
+		tab = Shuffleboard.getTab("Robot");
+
 		this.speedSupplier = speedSupplier;
 		this.turnSupplier = turnSupplier;
 
@@ -50,6 +60,10 @@ public class DriveSubsystem extends SubsystemBase {
 		leftSlave = new WPI_TalonFX(Constants.leftSlavePort);
 		rightMain = new WPI_TalonFX(Constants.rightMainPort);
 		rightSlave = new WPI_TalonFX(Constants.rightSlavePort);
+
+		brakeEntry = tab.add("Brake Mode", true).getEntry();
+		voltageEntry = tab.add("Drivetrain Max Voltage", Constants.drivetrainMaxVoltage).getEntry();
+		rampEntry = tab.add("Ramp Rate", Constants.drivetrainRampRate).getEntry();
 
 		leftSlave.follow(leftMain);
 		rightSlave.follow(rightMain);
@@ -67,7 +81,7 @@ public class DriveSubsystem extends SubsystemBase {
 		shifter = new Solenoid(Constants.PCMPort, Constants.shifterChannel);
 		upshift();
 
-		m_gyro = new ADXRS450_Gyro();
+		m_gyro = new ADIS16448_IMU();
 		m_drive = new DifferentialDrive(leftMain, rightMain);
 
 		m_odometry = new DifferentialDriveOdometry(new Rotation2d());
@@ -80,6 +94,22 @@ public class DriveSubsystem extends SubsystemBase {
 		Rotation2d gyroAngle = Rotation2d.fromDegrees(-m_gyro.getAngle());
 		m_odometry.update(gyroAngle, leftMain.getSensorCollection().getIntegratedSensorPosition(),
 				rightMain.getSensorCollection().getIntegratedSensorPosition());
+
+		updateFromShuffleboard();
+	}
+
+	private void updateFromShuffleboard() {
+		boolean brakeMode = brakeEntry.getBoolean(true);
+		leftMain.setNeutralMode(brakeMode ? NeutralMode.Brake : NeutralMode.Coast);
+		leftSlave.setNeutralMode(brakeMode ? NeutralMode.Brake : NeutralMode.Coast);
+		rightMain.setNeutralMode(brakeMode ? NeutralMode.Brake : NeutralMode.Coast);
+		rightSlave.setNeutralMode(brakeMode ? NeutralMode.Brake : NeutralMode.Coast);
+		double maxVoltage = voltageEntry.getDouble(12.0);
+		leftMain.configVoltageCompSaturation(maxVoltage);
+		rightMain.configVoltageCompSaturation(maxVoltage);
+		double rampRate = rampEntry.getDouble(0.2);
+		leftMain.configOpenloopRamp(rampRate);
+		rightMain.configOpenloopRamp(rampRate);
 	}
 
 	public void upshift() {

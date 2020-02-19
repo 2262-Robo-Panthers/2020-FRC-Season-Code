@@ -7,13 +7,20 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
+
+	private final ShuffleboardTab tab;
+	private final NetworkTableEntry speedEntry;
 
 	private final WPI_VictorSPX rollerMotor;
 	private final WPI_VictorSPX deployMotor;
@@ -23,6 +30,8 @@ public class IntakeSubsystem extends SubsystemBase {
 	 * Creates a new IntakeSubsystem.
 	 */
 	public IntakeSubsystem() {
+		tab = Shuffleboard.getTab("Robot");
+		speedEntry = tab.add("Intake Speed", -0.5).getEntry();
 		rollerMotor = new WPI_VictorSPX(Constants.intakeRollerPort);
 		deployMotor = new WPI_VictorSPX(Constants.intakeDeployMotorPort);
 		deployEncoder = new Encoder(Constants.intakeDeployEncoderChannels[0], Constants.intakeDeployEncoderChannels[1]);
@@ -34,11 +43,7 @@ public class IntakeSubsystem extends SubsystemBase {
 	}
 
 	public void spinRoller() {
-		rollerMotor.set(-0.5);
-	}
-
-	public void stopRoller() {
-		rollerMotor.set(0);
+		rollerMotor.set(ControlMode.PercentOutput, speedEntry.getDouble(-0.5));
 	}
 
 	public void runDeployMotor(boolean backward) {
